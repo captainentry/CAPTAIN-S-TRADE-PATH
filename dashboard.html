@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Captain's TradePath</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+  background: radial-gradient(ellipse at top, #1a1408 0%, #0a0806 100%);
+  color: white;
+  min-height: 100vh;
+  padding: 20px;
+}
+.header {
+  max-width: 1100px;
+  margin: 0 auto 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid #3a2f10;
+}
+.logo {
+  font-size: 1.1rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #fff8dc, #f0b90b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1px;
+}
+.logout {
+  background: transparent;
+  border: 1px solid #f0b90b;
+  color: #f0b90b;
+  padding: 9px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  transition: 0.3s;
+  font-family: inherit;
+}
+.logout:hover { background: #f0b90b; color: #0a0806; }
+.container { max-width: 1100px; margin: 0 auto; }
+h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #fff8dc, #f0b90b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.greeting { color: #b8a05a; margin-bottom: 40px; font-size: 0.95rem; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+.card {
+  background: rgba(20, 16, 8, 0.9);
+  border: 1px solid #3a2f10;
+  border-radius: 16px;
+  padding: 25px;
+  transition: 0.3s;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.card:hover {
+  border-color: #f0b90b;
+  transform: translateY(-4px);
+  box-shadow: 0 15px 40px rgba(240, 185, 11, 0.15);
+}
+.card .icon { font-size: 2rem; margin-bottom: 15px; }
+.card h3 { font-size: 1.1rem; margin-bottom: 8px; color: #f0b90b; }
+.card p { color: #b8a05a; font-size: 0.88rem; line-height: 1.5; }
+.loading {
+  text-align: center;
+  padding: 60px;
+  color: #b8a05a;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.contact {
+  text-align: center;
+  margin-top: 50px;
+  color: #8a7850;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.contact strong { color: #00a651; }
+@media (max-width: 640px) {
+  h1 { font-size: 1.5rem; }
+  .header { padding: 15px 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">CAPTAIN'S TRADEPATH</div>
+  <button class="logout" id="logoutBtn">Log Out</button>
+</div>
+
+<div class="loading" id="loading">Loading your dashboard...</div>
+
+<div class="container" id="content" style="display:none;">
+  <h1 id="welcome">Welcome</h1>
+  <p class="greeting">Only Risk Takers Win</p>
+
+  <div class="grid">
+    <a href="index.html#courses" class="card">
+      <div class="icon">🎓</div>
+      <h3>Courses</h3>
+      <p>Technical Analysis, Price Action, SMC, Order Flow, and more.</p>
+    </a>
+    <a href="index.html#signals" class="card">
+      <div class="icon">📊</div>
+      <h3>Signals</h3>
+      <p>Live buy & sell signals with entry, SL, and take profits.</p>
+    </a>
+    <a href="index.html#dealermap" class="card">
+      <div class="icon">📈</div>
+      <h3>Dealer Map</h3>
+      <p>XAUUSD dealer positioning levels and live chart.</p>
+    </a>
+    <a href="index.html#books" class="card">
+      <div class="icon">📚</div>
+      <h3>Books Library</h3>
+      <p>Download premium trading guides and playbooks.</p>
+    </a>
+    <a href="index.html#pay" class="card">
+      <div class="icon">💳</div>
+      <h3>How to Pay</h3>
+      <p>Send payment via M-Pesa and get instant access.</p>
+    </a>
+    <a href="index.html#faq" class="card">
+      <div class="icon">❓</div>
+      <h3>Help & FAQ</h3>
+      <p>Answers to common questions about courses and payments.</p>
+    </a>
+  </div>
+
+  <p class="contact">
+    Need help? Contact Captain on M-Pesa line: <strong>0116861680</strong>
+  </p>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://jzvrfjuesglzkemyx.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_UH1LpextxT6xmh9j_IOyQ_lIaNRFPg';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function checkUser() {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  const name = user.user_metadata?.full_name || user.email.split('@')[0];
+  document.getElementById('welcome').textContent = 'Welcome, ' + name;
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await supabase.auth.signOut();
+  window.location.href = 'index.html';
+});
+
+checkUser();
+</script>
+</body>
+</html>
