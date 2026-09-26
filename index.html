@@ -54,27 +54,29 @@
     .nav-cta:hover { box-shadow: 0 0 20px rgba(240, 185, 11, 0.5); }
     .menu-btn { display: none; background: none; border: none; color: #f0b90b; font-size: 1.5rem; cursor: pointer; }
 
-    /* CHART BG */
+    /* CANDLESTICK BACKGROUND */
     .chart-bg {
       position: fixed;
       inset: 0;
-      opacity: 0.12;
+      opacity: 0.25;
       z-index: 0;
       pointer-events: none;
+      overflow: hidden;
     }
-    .chart-bg svg { width: 100%; height: 100%; }
-    .chart-line {
-      stroke: #f0b90b;
-      stroke-width: 3;
-      fill: none;
-      stroke-dasharray: 2000;
-      stroke-dashoffset: 2000;
-      animation: drawLine 5s ease forwards infinite;
-      filter: drop-shadow(0 0 8px #f0b90b);
+    .chart-bg svg { width: 100%; height: 100%; display: block; }
+    .candle-body, .candle-wick {
+      opacity: 0;
+      animation: drawCandle 8s ease-in-out infinite;
     }
-    @keyframes drawLine { to { stroke-dashoffset: 0; } }
+    @keyframes drawCandle {
+      0%   { opacity: 0; }
+      15%  { opacity: 1; }
+      70%  { opacity: 1; }
+      90%  { opacity: 0; }
+      100% { opacity: 0; }
+    }
 
-    /* CANDLES */
+    /* FLOATING CANDLES */
     .candle {
       position: fixed;
       width: 6px;
@@ -133,18 +135,16 @@
       margin-bottom: 30px;
     }
     .avatar {
-      width: 150px;
-      height: 150px;
+      width: 180px;
+      height: 180px;
       border-radius: 50%;
       object-fit: cover;
+      object-position: center 15%;
       border: 4px solid #f0b90b;
       box-shadow: 0 0 70px rgba(240, 185, 11, 0.7);
       animation: pulse 3s ease-in-out infinite;
-      background: linear-gradient(135deg, #1a1408, #3a2f10);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 4rem;
+      display: block;
+      background: #1a1408;
     }
     @keyframes pulse {
       0%, 100% { box-shadow: 0 0 70px rgba(240, 185, 11, 0.7); }
@@ -340,7 +340,6 @@
       font-weight: 800;
       color: #f0b90b;
     }
-    .course .price span { font-size: 0.8rem; color: #8a7850; font-weight: 400; }
     .course .lock {
       font-size: 0.8rem;
       color: #8a7850;
@@ -567,7 +566,7 @@
       .hero h1 { font-size: 2.2rem; }
       .hero .tagline { font-size: 0.8rem; letter-spacing: 3px; }
       .section-title { font-size: 1.6rem; }
-      .avatar { width: 120px; height: 120px; }
+      .avatar { width: 140px; height: 140px; }
       .stat .num { font-size: 1.9rem; }
       .btn { padding: 14px 30px; font-size: 0.95rem; }
       .final-cta { padding: 50px 25px; }
@@ -577,12 +576,8 @@
 </head>
 <body>
 
-<!-- CHART BACKGROUND -->
-<div class="chart-bg">
-  <svg viewBox="0 0 1000 600" preserveAspectRatio="none">
-    <path class="chart-line" d="M 0,500 L 100,480 L 150,490 L 200,420 L 250,440 L 300,350 L 350,380 L 400,300 L 450,320 L 500,220 L 550,250 L 600,150 L 650,180 L 700,100 L 750,130 L 800,60 L 850,90 L 900,30 L 950,50 L 1000,10" />
-  </svg>
-</div>
+<!-- CANDLESTICK BACKGROUND -->
+<div class="chart-bg" id="chartBg"></div>
 
 <!-- NAV -->
 <nav>
@@ -602,7 +597,7 @@
 <section class="hero">
   <div class="container">
     <div class="avatar-wrap">
-      <div class="avatar">👨‍✈️</div>
+      <img src="captain.jpg" alt="Captain" class="avatar">
     </div>
     <h1>CAPTAIN'S TRADEPATH</h1>
     <p class="tagline">Only Risk Takers Win</p>
@@ -926,6 +921,62 @@
 </footer>
 
 <script>
+  // === Generate animated candlestick chart background ===
+  (function generateChart() {
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 1200 600');
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+    document.getElementById('chartBg').appendChild(svg);
+
+    const n = 55;
+    const step = 1200 / n;
+    let price = 320;
+
+    for (let i = 0; i < n; i++) {
+      const open = price;
+      const drift = -3;
+      const move = drift + (Math.random() - 0.5) * 42;
+      const close = open + move;
+
+      const bodyTop = Math.min(open, close);
+      const bodyHeight = Math.max(Math.abs(close - open), 3);
+      const wickTop = bodyTop - (5 + Math.random() * 25);
+      const wickBottom = bodyTop + bodyHeight + (5 + Math.random() * 25);
+
+      const isGreen = close < open;
+      const color = isGreen ? '#16c784' : '#ea3943';
+      const x = i * step + step * 0.22;
+      const w = step * 0.56;
+
+      const wick = document.createElementNS(svgNS, 'line');
+      wick.setAttribute('x1', x + w / 2);
+      wick.setAttribute('x2', x + w / 2);
+      wick.setAttribute('y1', wickTop);
+      wick.setAttribute('y2', wickBottom);
+      wick.setAttribute('stroke', color);
+      wick.setAttribute('stroke-width', '2');
+      wick.setAttribute('class', 'candle-wick');
+      wick.style.animationDelay = (i * 0.08) + 's';
+      wick.style.filter = 'drop-shadow(0 0 4px ' + color + ')';
+      svg.appendChild(wick);
+
+      const rect = document.createElementNS(svgNS, 'rect');
+      rect.setAttribute('x', x);
+      rect.setAttribute('y', bodyTop);
+      rect.setAttribute('width', w);
+      rect.setAttribute('height', bodyHeight);
+      rect.setAttribute('fill', color);
+      rect.setAttribute('rx', '2');
+      rect.setAttribute('class', 'candle-body');
+      rect.style.animationDelay = (i * 0.08) + 's';
+      rect.style.filter = 'drop-shadow(0 0 4px ' + color + ')';
+      svg.appendChild(rect);
+
+      price = close;
+    }
+  })();
+
   // Floating candles
   const body = document.body;
   const colors = ['green', 'green', 'green', 'red'];
@@ -958,7 +1009,7 @@
     a.addEventListener('click', () => navLinks.classList.remove('mobile-open'));
   });
 
-  // Smooth nav shadow on scroll
+  // Nav shadow on scroll
   window.addEventListener('scroll', () => {
     const nav = document.querySelector('nav');
     if (window.scrollY > 30) {
