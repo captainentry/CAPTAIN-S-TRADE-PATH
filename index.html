@@ -2,38 +2,971 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Captain's TradePath</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Captain's TradePath — Only Risk Takers Win</title>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
-      margin: 0;
-      font-family: sans-serif;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      font-family: -apple-system, 'Segoe UI', sans-serif;
+      background: #0a0806;
       color: white;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 18px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 8, 6, 0.85);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(240, 185, 11, 0.15);
+    }
+    .nav-logo {
+      font-weight: 800;
+      letter-spacing: 2px;
+      font-size: 1.1rem;
+      background: linear-gradient(90deg, #fff8dc, #f0b90b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-links { display: flex; gap: 30px; align-items: center; }
+    .nav-links a {
+      color: #b8a05a;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: 0.2s;
+    }
+    .nav-links a:hover { color: #f0b90b; }
+    .nav-cta {
+      background: linear-gradient(135deg, #f0b90b, #d99e08);
+      color: #0a0806 !important;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-weight: 700 !important;
+    }
+    .nav-cta:hover { box-shadow: 0 0 20px rgba(240, 185, 11, 0.5); }
+    .menu-btn { display: none; background: none; border: none; color: #f0b90b; font-size: 1.5rem; cursor: pointer; }
+
+    /* CHART BG */
+    .chart-bg {
+      position: fixed;
+      inset: 0;
+      opacity: 0.12;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .chart-bg svg { width: 100%; height: 100%; }
+    .chart-line {
+      stroke: #f0b90b;
+      stroke-width: 3;
+      fill: none;
+      stroke-dasharray: 2000;
+      stroke-dashoffset: 2000;
+      animation: drawLine 5s ease forwards infinite;
+      filter: drop-shadow(0 0 8px #f0b90b);
+    }
+    @keyframes drawLine { to { stroke-dashoffset: 0; } }
+
+    /* CANDLES */
+    .candle {
+      position: fixed;
+      width: 6px;
+      border-radius: 2px;
+      opacity: 0;
+      animation: riseUp 4s ease-out infinite;
+      z-index: 0;
+      pointer-events: none;
+      box-shadow: 0 0 10px currentColor;
+    }
+    .candle.green { background: #16c784; color: #16c784; }
+    .candle.red { background: #ea3943; color: #ea3943; }
+    @keyframes riseUp {
+      0% { transform: translateY(0); opacity: 0; }
+      20% { opacity: 0.6; }
+      100% { transform: translateY(-100vh); opacity: 0; }
+    }
+
+    /* SECTIONS */
+    section { position: relative; z-index: 2; padding: 100px 40px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      text-align: center;
+      background: linear-gradient(90deg, #fff8dc, #f0b90b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 1px;
+    }
+    .section-sub {
+      text-align: center;
+      color: #b8a05a;
+      margin-bottom: 60px;
+      font-size: 1rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding-top: 140px;
+    }
+    .avatar-wrap {
+      position: relative;
+      margin-bottom: 30px;
+    }
+    .avatar {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #f0b90b;
+      box-shadow: 0 0 70px rgba(240, 185, 11, 0.7);
+      animation: pulse 3s ease-in-out infinite;
+      background: linear-gradient(135deg, #1a1408, #3a2f10);
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      text-align: center;
+      font-size: 4rem;
     }
-    h1 { font-size: 3rem; margin-bottom: 10px; }
-    p { color: #b8b8ff; font-size: 1.2rem; }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 70px rgba(240, 185, 11, 0.7); }
+      50% { box-shadow: 0 0 100px rgba(240, 185, 11, 1); }
+    }
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+      background: linear-gradient(90deg, #fff8dc, #f0b90b, #ffd86b, #f0b90b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+    }
+    .hero .tagline {
+      color: #f0b90b;
+      font-size: 1.05rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      margin-bottom: 35px;
+      opacity: 0.9;
+    }
+    .phone-notification {
+      background: rgba(20, 16, 8, 0.95);
+      border: 1px solid #f0b90b;
+      border-radius: 16px;
+      padding: 16px 22px;
+      margin-bottom: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 10px 40px rgba(240, 185, 11, 0.4);
+      animation: slideIn 1s ease, glow 2.5s ease-in-out infinite 1s;
+      max-width: 420px;
+      text-align: left;
+    }
+    @keyframes slideIn {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 10px 40px rgba(240, 185, 11, 0.4); }
+      50% { box-shadow: 0 10px 60px rgba(240, 185, 11, 0.85); }
+    }
+    .phone-notification .icon { font-size: 2rem; filter: drop-shadow(0 0 6px #f0b90b); }
+    .phone-notification .title {
+      font-size: 0.7rem;
+      color: #f0b90b;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .phone-notification .msg { font-size: 0.95rem; font-weight: 600; }
+    .phone-notification .msg .gold { color: #f0b90b; font-weight: 800; }
+
+    .buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
     .btn {
-      display: inline-block;
-      padding: 14px 32px;
-      background: #6c5ce7;
-      color: white;
+      padding: 16px 42px;
+      border-radius: 10px;
       text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: 0.3s;
+      border: 2px solid transparent;
+      cursor: pointer;
+      letter-spacing: 1px;
+      display: inline-block;
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, #f0b90b, #d99e08);
+      color: #0a0806;
+      box-shadow: 0 0 25px rgba(240, 185, 11, 0.4);
+    }
+    .btn.primary:hover {
+      background: linear-gradient(135deg, #ffd86b, #f0b90b);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(240, 185, 11, 0.7);
+    }
+    .btn.outline {
+      background: transparent;
+      border: 2px solid #f0b90b;
+      color: #f0b90b;
+    }
+    .btn.outline:hover { background: #f0b90b; color: #0a0806; }
+
+    /* STATS */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 30px;
+      max-width: 800px;
+      margin: 60px auto 0;
+    }
+    .stat { text-align: center; }
+    .stat .num {
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, #fff8dc, #f0b90b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat .label {
+      color: #b8a05a;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    /* FEATURES */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 25px;
+    }
+    .feature {
+      background: rgba(20, 16, 8, 0.8);
+      border: 1px solid #3a2f10;
+      border-radius: 18px;
+      padding: 32px 26px;
+      transition: 0.3s;
+    }
+    .feature:hover {
+      border-color: #f0b90b;
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(240, 185, 11, 0.15);
+    }
+    .feature .icon { font-size: 2.4rem; margin-bottom: 18px; }
+    .feature h3 { color: #f0b90b; font-size: 1.15rem; margin-bottom: 10px; }
+    .feature p { color: #b8a05a; font-size: 0.92rem; line-height: 1.6; }
+
+    /* COURSES */
+    .course-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+    }
+    .course {
+      background: rgba(20, 16, 8, 0.9);
+      border: 1px solid #3a2f10;
+      border-radius: 16px;
+      padding: 26px;
+      transition: 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .course::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 3px;
+      background: linear-gradient(90deg, #f0b90b, transparent);
+    }
+    .course:hover {
+      border-color: #f0b90b;
+      transform: translateY(-5px);
+      box-shadow: 0 20px 50px rgba(240, 185, 11, 0.2);
+    }
+    .course .level {
+      font-size: 0.7rem;
+      color: #f0b90b;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .course h3 {
+      font-size: 1.15rem;
+      margin-bottom: 10px;
+      color: #fff;
+      line-height: 1.4;
+    }
+    .course .desc {
+      color: #8a7850;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      min-height: 40px;
+    }
+    .course .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid #3a2f10;
+    }
+    .course .price {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #f0b90b;
+    }
+    .course .price span { font-size: 0.8rem; color: #8a7850; font-weight: 400; }
+    .course .lock {
+      font-size: 0.8rem;
+      color: #8a7850;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* SIGNAL CARD */
+    .signal-card {
+      max-width: 440px;
+      margin: 0 auto;
+      background: rgba(20, 16, 8, 0.95);
+      border: 1px solid #f0b90b;
+      border-radius: 18px;
+      padding: 26px;
+      box-shadow: 0 20px 60px rgba(240, 185, 11, 0.2);
+    }
+    .signal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #3a2f10;
+    }
+    .signal-pair { font-size: 1.3rem; font-weight: 800; color: #fff; }
+    .signal-badge {
+      background: rgba(22, 199, 132, 0.2);
+      color: #16c784;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .signal-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(58, 47, 16, 0.5);
+    }
+    .signal-row:last-child { border-bottom: none; }
+    .signal-row .k { color: #8a7850; font-size: 0.85rem; }
+    .signal-row .v { color: #fff; font-weight: 700; font-size: 0.95rem; }
+    .signal-row .v.sl { color: #ea3943; }
+    .signal-row .v.tp { color: #16c784; }
+
+    /* BOOKS */
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 25px;
+    }
+    .book {
+      background: rgba(20, 16, 8, 0.9);
+      border: 1px solid #3a2f10;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: 0.3s;
+    }
+    .book:hover {
+      border-color: #f0b90b;
+      transform: translateY(-5px);
+    }
+    .book .cover {
+      width: 100%;
+      aspect-ratio: 2/3;
+      background: linear-gradient(135deg, #3a2f10, #1a1408);
       border-radius: 8px;
-      margin: 8px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      border: 1px solid #f0b90b;
+    }
+    .book .title { font-size: 0.9rem; color: #fff; font-weight: 600; margin-bottom: 6px; }
+    .book .price { color: #f0b90b; font-weight: 800; font-size: 1.1rem; }
+
+    /* TESTIMONIALS */
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+    }
+    .testimonial {
+      background: rgba(20, 16, 8, 0.9);
+      border: 1px solid #3a2f10;
+      border-radius: 16px;
+      padding: 26px;
+    }
+    .testimonial .stars { color: #f0b90b; margin-bottom: 14px; font-size: 0.95rem; letter-spacing: 2px; }
+    .testimonial p { color: #d0c090; font-size: 0.92rem; line-height: 1.7; margin-bottom: 20px; font-style: italic; }
+    .testimonial .author { display: flex; align-items: center; gap: 12px; }
+    .testimonial .author .avatar-sm {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f0b90b, #d99e08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #0a0806;
+      font-size: 0.9rem;
+    }
+    .testimonial .author .name { font-size: 0.9rem; font-weight: 700; color: #fff; }
+    .testimonial .author .role { font-size: 0.75rem; color: #8a7850; }
+
+    /* FAQ */
+    .faq { max-width: 750px; margin: 0 auto; }
+    .faq-item {
+      background: rgba(20, 16, 8, 0.9);
+      border: 1px solid #3a2f10;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      transition: 0.3s;
+    }
+    .faq-item:hover { border-color: #f0b90b; }
+    .faq-q {
+      padding: 20px 24px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      color: #fff;
+      font-size: 0.98rem;
+    }
+    .faq-q .arrow { color: #f0b90b; font-size: 1.2rem; transition: 0.3s; }
+    .faq-item.open .arrow { transform: rotate(180deg); }
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: 0.3s;
+      padding: 0 24px;
+      color: #b8a05a;
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+    .faq-item.open .faq-a {
+      max-height: 300px;
+      padding: 0 24px 22px;
+    }
+
+    /* FINAL CTA */
+    .final-cta {
+      text-align: center;
+      background: linear-gradient(135deg, rgba(240, 185, 11, 0.08), rgba(240, 185, 11, 0.02));
+      border: 1px solid #f0b90b;
+      border-radius: 24px;
+      padding: 70px 40px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .final-cta h2 {
+      font-size: 2.2rem;
+      margin-bottom: 15px;
+      background: linear-gradient(90deg, #fff8dc, #f0b90b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 800;
+    }
+    .final-cta p { color: #b8a05a; margin-bottom: 35px; font-size: 1rem; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid rgba(240, 185, 11, 0.15);
+      padding: 50px 40px 30px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+    footer .logo {
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, #fff8dc, #f0b90b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+    }
+    footer .disclaimer {
+      color: #6a5a40;
+      font-size: 0.78rem;
+      max-width: 700px;
+      margin: 20px auto 0;
+      line-height: 1.7;
+    }
+    footer .links {
+      display: flex;
+      gap: 25px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+    }
+    footer .links a {
+      color: #8a7850;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    footer .links a:hover { color: #f0b90b; }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .nav-links.mobile-open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        background: rgba(10, 8, 6, 0.98);
+        padding: 20px;
+        gap: 15px;
+        border-bottom: 1px solid rgba(240, 185, 11, 0.15);
+      }
+      .menu-btn { display: block; }
+      section { padding: 70px 20px; }
+      .hero h1 { font-size: 2.2rem; }
+      .hero .tagline { font-size: 0.8rem; letter-spacing: 3px; }
+      .section-title { font-size: 1.6rem; }
+      .avatar { width: 120px; height: 120px; }
+      .stat .num { font-size: 1.9rem; }
+      .btn { padding: 14px 30px; font-size: 0.95rem; }
+      .final-cta { padding: 50px 25px; }
+      .final-cta h2 { font-size: 1.6rem; }
     }
   </style>
 </head>
 <body>
-  <div>
-    <h1>CAPTAIN'S TRADEPATH</h1>
-    <p>Only Risk Takers Win</p>
-    <a href="#" class="btn">Sign Up</a>
-    <a href="#" class="btn">Login</a>
+
+<!-- CHART BACKGROUND -->
+<div class="chart-bg">
+  <svg viewBox="0 0 1000 600" preserveAspectRatio="none">
+    <path class="chart-line" d="M 0,500 L 100,480 L 150,490 L 200,420 L 250,440 L 300,350 L 350,380 L 400,300 L 450,320 L 500,220 L 550,250 L 600,150 L 650,180 L 700,100 L 750,130 L 800,60 L 850,90 L 900,30 L 950,50 L 1000,10" />
+  </svg>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">CAPTAIN'S TRADEPATH</div>
+  <button class="menu-btn" id="menuBtn">☰</button>
+  <div class="nav-links" id="navLinks">
+    <a href="#courses">Courses</a>
+    <a href="#signals">Signals</a>
+    <a href="#books">Books</a>
+    <a href="#faq">FAQ</a>
+    <a href="login.html">Login</a>
+    <a href="signup.html" class="nav-cta">Sign Up</a>
   </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="avatar-wrap">
+      <div class="avatar">👨‍✈️</div>
+    </div>
+    <h1>CAPTAIN'S TRADEPATH</h1>
+    <p class="tagline">Only Risk Takers Win</p>
+
+    <div class="phone-notification">
+      <div class="icon">📱</div>
+      <div>
+        <div class="title">Signal Alert</div>
+        <div class="msg">🟢 BUY <span class="gold">GOLD</span> • Entry 2,340 • TP 2,380</div>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <a href="signup.html" class="btn primary">Start Learning</a>
+      <a href="#courses" class="btn outline">View Courses</a>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="num">8</div><div class="label">Courses</div></div>
+      <div class="stat"><div class="num">270+</div><div class="label">Lessons</div></div>
+      <div class="stat"><div class="num">Live</div><div class="label">Signals</div></div>
+      <div class="stat"><div class="num">24/7</div><div class="label">Support</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section>
+  <div class="container">
+    <h2 class="section-title">Why Traders Choose Us</h2>
+    <p class="section-sub">Everything you need to trade with confidence — in one place.</p>
+
+    <div class="grid-4">
+      <div class="feature">
+        <div class="icon">📊</div>
+        <h3>Real-Time Signals</h3>
+        <p>Buy & sell signals with entry, stop loss, and multiple take profits — straight to your dashboard.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🎓</div>
+        <h3>Complete Course Library</h3>
+        <p>From Technical Analysis to Order Flow — structured lessons built for real trading.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">✉️</div>
+        <h3>Private Q&A</h3>
+        <p>Ask questions directly. Get personal answers — not lost in a public chat.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📚</div>
+        <h3>Books & Resources</h3>
+        <p>Download premium trading books and cheat sheets to level up your edge.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COURSES -->
+<section id="courses">
+  <div class="container">
+    <h2 class="section-title">Courses</h2>
+    <p class="section-sub">Structured learning paths — from beginner to advanced. Buy individually or unlock everything.</p>
+
+    <div class="course-grid">
+      <div class="course">
+        <div class="level">Beginner</div>
+        <h3>Technical Analysis</h3>
+        <p class="desc">Market structure, indicators, support & resistance, and chart reading from the ground up.</p>
+        <div class="price-row">
+          <div class="price">$130</div>
+          <div class="lock">🔒 Members</div>
+        </div>
+      </div>
+
+      <div class="course">
+        <div class="level">Beginner</div>
+        <h3>Price Action</h3>
+        <p class="desc">Candlesticks, patterns, breakouts, and momentum — read raw price without indicators.</p>
+        <div class="price-row">
+          <div class="price">$80</div>
+          <div class="lock">🔒 Members</div>
+        </div>
+      </div>
+
+      <div class="course">
+        <div class="level">Intermediate</div>
+        <h3>Smart Money Concept (SMC)</h3>
+        <p class="desc">Liquidity, order blocks, fair value gaps, premium/discount, and institutional entry models.</p>
+        <div class="price-row">
+          <div class="price">$149</div>
+          <div class="lock">🔒 Members</div>
+        </div>
+      </div>
+
+      <div class="course">
+        <div class="level">Advanced</div>
+        <h3>Order Flow & Market Microstructure</h3>
+        <p class="desc">Delta, absorption, liquidity mechanics, auction theory, and volume profile.</p>
+        <div class="price-row">
+          <div class="price">$200</div>
+          <div class="lock">🔒 Members</div>
+        </div>
+      </div>
+
+      <div class="course">
+        <div class="level">Advanced</div>
+        <h3>Footprint Charts</h3>
+        <p class="desc">Bid/ask volume, delta divergence, absorption, and footprint confirmation for entries.</p>
+        <div class="price-row">
+          <div class="price">$100</div>
+          <div class="lock">🔒 Members</div>
+        </div>
+      </div>
+
+      <div class="course">
+        <div class="level">Advanced</div>
+        <h3>Option Flow & Dealer Positioning</h3>
+        <p class="desc">GEX, gamma walls, dealer positioning, sweeps, and unusual options activity.</p>
+        <div class="price-row">
+          <div class="price">$250</div>
+          <div class="lock">🔒 Members</div>
+        </div>
+      </div>
+
+      <div class="course">
+        <div class="level">Tool</div>
+        <h3>Dealer Mapping — Barchart</h3>
+        <p class="desc">Read dealer positioning live using Barchart's GEX tool, walls, and options chain data.</p>
+        <div class="price-row">
+          <div class="price">$150</div>
+          <div class="lock">🔒 Members</div>
+        </div>
+      </div>
+
+      <div class="course">
+        <div class="level">Advanced</div>
+        <h3>Options Expiry</h3>
+        <p class="desc">0DTE, weekly/monthly cycles, pin risk, expiry magnets, and post-expiry repricing.</p>
+        <div class="price-row">
+          <div class="price">$180</div>
+          <div class="lock">🔒 Members</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIGNAL SAMPLE -->
+<section id="signals">
+  <div class="container">
+    <h2 class="section-title">Signals That Speak For Themselves</h2>
+    <p class="section-sub">Every signal comes with entry, stop loss, multiple take profits, and clear reasoning.</p>
+
+    <div class="signal-card">
+      <div class="signal-header">
+        <div class="signal-pair">GOLD</div>
+        <div class="signal-badge">ACTIVE</div>
+      </div>
+      <div class="signal-row"><span class="k">Direction</span><span class="v" style="color:#16c784;">BUY 🟢</span></div>
+      <div class="signal-row"><span class="k">Entry</span><span class="v">2,340.00</span></div>
+      <div class="signal-row"><span class="k">Stop Loss</span><span class="v sl">2,320.00</span></div>
+      <div class="signal-row"><span class="k">Take Profit 1</span><span class="v tp">2,360.00</span></div>
+      <div class="signal-row"><span class="k">Take Profit 2</span><span class="v tp">2,380.00</span></div>
+      <div class="signal-row"><span class="k">Take Profit 3</span><span class="v tp">2,410.00</span></div>
+      <div class="signal-row"><span class="k">Timeframe</span><span class="v">H1</span></div>
+      <div class="signal-row"><span class="k">Risk</span><span class="v">1%</span></div>
+    </div>
+
+    <p style="text-align:center; color:#8a7850; font-size:0.85rem; margin-top:30px;">
+      🔒 Signals are only visible to logged-in members
+    </p>
+  </div>
+</section>
+
+<!-- BOOKS -->
+<section id="books">
+  <div class="container">
+    <h2 class="section-title">Books Library</h2>
+    <p class="section-sub">Premium trading books — download and own them forever.</p>
+
+    <div class="book-grid">
+      <div class="book">
+        <div class="cover">📕</div>
+        <div class="title">Trading in the Zone</div>
+        <div class="price">$30</div>
+      </div>
+      <div class="book">
+        <div class="cover">📗</div>
+        <div class="title">Mind Over Markets</div>
+        <div class="price">$30</div>
+      </div>
+      <div class="book">
+        <div class="cover">📘</div>
+        <div class="title">Trading & Exchanges</div>
+        <div class="price">$30</div>
+      </div>
+      <div class="book">
+        <div class="cover">📙</div>
+        <div class="title">Option Volatility & Pricing</div>
+        <div class="price">$30</div>
+      </div>
+      <div class="book">
+        <div class="cover">📓</div>
+        <div class="title">The Disciplined Trader</div>
+        <div class="price">$30</div>
+      </div>
+      <div class="book">
+        <div class="cover">📔</div>
+        <div class="title">Technical Analysis</div>
+        <div class="price">$30</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section>
+  <div class="container">
+    <h2 class="section-title">What Traders Say</h2>
+    <p class="section-sub">Real feedback from members of the TradePath community.</p>
+
+    <div class="testimonial-grid">
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p>"The Order Flow course changed how I see the market. I finally understand why price moves the way it does."</p>
+        <div class="author">
+          <div class="avatar-sm">JM</div>
+          <div>
+            <div class="name">James M.</div>
+            <div class="role">Forex Trader</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p>"The Captain's signals are clean and honest. No hype, just clear entries with reasoning. This is rare."</p>
+        <div class="author">
+          <div class="avatar-sm">SK</div>
+          <div>
+            <div class="name">Sarah K.</div>
+            <div class="role">Options Trader</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p>"I've taken many courses. This is the first time someone explained SMC in plain English without the buzzwords."</p>
+        <div class="author">
+          <div class="avatar-sm">DO</div>
+          <div>
+            <div class="name">David O.</div>
+            <div class="role">Day Trader</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="container">
+    <h2 class="section-title">Questions?</h2>
+    <p class="section-sub">Everything you need to know before joining.</p>
+
+    <div class="faq">
+      <div class="faq-item">
+        <div class="faq-q">How do I pay? <span class="arrow">▼</span></div>
+        <div class="faq-a">We accept M-Pesa. Simply send the amount to our M-Pesa number shown at checkout, then enter the transaction code. Your access is activated after quick verification.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I buy just one course? <span class="arrow">▼</span></div>
+        <div class="faq-a">Yes! Every course can be purchased individually. Or subscribe to unlock the entire library at once — cheaper if you plan to study multiple courses.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Do I get lifetime access? <span class="arrow">▼</span></div>
+        <div class="faq-a">Single course purchases give you lifetime access to that course. Subscriptions give you access to everything while active.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Are signals included with courses? <span class="arrow">▼</span></div>
+        <div class="faq-a">Signals are available to all members. Some free signals are public, but full access requires an account.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is this financial advice? <span class="arrow">▼</span></div>
+        <div class="faq-a">No. Everything shared here is for educational purposes. Trading involves risk and past performance does not guarantee future results. Always do your own research.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section>
+  <div class="container">
+    <div class="final-cta">
+      <h2>Ready to Start Your TradePath?</h2>
+      <p>Join the community and get instant access to signals, courses, and the books library.</p>
+      <div class="buttons">
+        <a href="signup.html" class="btn primary">Create Account</a>
+        <a href="#courses" class="btn outline">Browse Courses</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">CAPTAIN'S TRADEPATH</div>
+  <div class="links">
+    <a href="#courses">Courses</a>
+    <a href="#signals">Signals</a>
+    <a href="#books">Books</a>
+    <a href="#faq">FAQ</a>
+    <a href="login.html">Login</a>
+    <a href="signup.html">Sign Up</a>
+  </div>
+  <p class="disclaimer">
+    <strong>Risk Disclaimer:</strong> Not financial advice. Trading involves risk. Past performance does not guarantee future results. Only trade with money you can afford to lose.
+    <br><br>
+    © 2026 Captain's TradePath. All rights reserved.
+  </p>
+</footer>
+
+<script>
+  // Floating candles
+  const body = document.body;
+  const colors = ['green', 'green', 'green', 'red'];
+  function spawnCandle() {
+    const c = document.createElement('div');
+    c.className = 'candle ' + colors[Math.floor(Math.random() * colors.length)];
+    c.style.height = (20 + Math.random() * 60) + 'px';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.bottom = '-100px';
+    c.style.animationDuration = (3 + Math.random() * 2) + 's';
+    body.appendChild(c);
+    setTimeout(() => c.remove(), 5000);
+  }
+  setInterval(spawnCandle, 400);
+
+  // FAQ toggle
+  document.querySelectorAll('.faq-q').forEach(q => {
+    q.addEventListener('click', () => {
+      q.parentElement.classList.toggle('open');
+    });
+  });
+
+  // Mobile menu
+  const menuBtn = document.getElementById('menuBtn');
+  const navLinks = document.getElementById('navLinks');
+  menuBtn.addEventListener('click', () => {
+    navLinks.classList.toggle('mobile-open');
+  });
+  navLinks.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => navLinks.classList.remove('mobile-open'));
+  });
+
+  // Smooth nav shadow on scroll
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    if (window.scrollY > 30) {
+      nav.style.boxShadow = '0 5px 30px rgba(0, 0, 0, 0.5)';
+    } else {
+      nav.style.boxShadow = 'none';
+    }
+  });
+</script>
 </body>
 </html>
