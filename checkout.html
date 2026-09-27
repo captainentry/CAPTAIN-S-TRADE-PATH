@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Captain's TradePath</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+  background: radial-gradient(ellipse at top, #1a1408 0%, #0a0806 100%);
+  color: white;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+.container { max-width: 520px; margin: 0 auto; }
+.brand {
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-size: 0.75rem;
+  color: #f0b90b;
+  margin-bottom: 30px;
+  opacity: 0.85;
+}
+.card {
+  background: rgba(20, 16, 8, 0.95);
+  border: 1px solid #f0b90b;
+  border-radius: 20px;
+  padding: 35px 30px;
+  box-shadow: 0 20px 60px rgba(240, 185, 11, 0.2);
+}
+.item-summary {
+  text-align: center;
+  padding-bottom: 25px;
+  margin-bottom: 25px;
+  border-bottom: 1px dashed #3a2f10;
+}
+.item-label {
+  color: #b8a05a;
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.item-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.item-price {
+  font-size: 2rem;
+  font-weight: 900;
+  background: linear-gradient(90deg, #fff8dc, #f0b90b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.step-label {
+  color: #f0b90b;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.mpesa-block {
+  background: linear-gradient(135deg, #0a1f0f, #0d2a14);
+  border: 2px solid #00a651;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+.mpesa-logo {
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.mpesa-m { color: #00a651; font-size: 1.1rem; }
+.mpesa-dash { color: #fff; margin: 0 2px; }
+.mpesa-pesa { color: #fff; }
+.mpesa-number {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 3px;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 20px rgba(0, 166, 81, 0.8);
+  margin: 8px 0 4px;
+}
+.mpesa-hint {
+  color: #7fbf94;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+}
+label {
+  display: block;
+  font-size: 0.75rem;
+  color: #f0b90b;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid #3a2f10;
+  border-radius: 10px;
+  color: white;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+input:focus {
+  outline: none;
+  border-color: #f0b90b;
+  box-shadow: 0 0 20px rgba(240, 185, 11, 0.2);
+}
+button {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #f0b90b, #d99e08);
+  color: #0a0806;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: 0.3s;
+  font-family: inherit;
+}
+button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ffd86b, #f0b90b);
+  box-shadow: 0 10px 30px rgba(240, 185, 11, 0.5);
+}
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+.message {
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 0.9rem;
+  display: none;
+  line-height: 1.5;
+}
+.message.error {
+  display: block;
+  background: rgba(234, 57, 67, 0.2);
+  border: 1px solid #ea3943;
+  color: #ff8a8f;
+}
+.message.success {
+  display: block;
+  background: rgba(22, 199, 132, 0.2);
+  border: 1px solid #16c784;
+  color: #7fffc8;
+}
+.back {
+  text-align: center;
+  margin-top: 20px;
+}
+.back a { color: #8a7850; text-decoration: none; font-size: 0.85rem; }
+.back a:hover { color: #f0b90b; }
+.loading {
+  text-align: center;
+  color: #b8a05a;
+  padding: 60px 20px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="brand">CAPTAIN'S TRADEPATH</div>
+
+  <div class="loading" id="loading">Loading checkout...</div>
+
+  <div class="card" id="checkoutCard" style="display:none;">
+    <div class="item-summary">
+      <div class="item-label" id="itemType">Book</div>
+      <div class="item-title" id="itemTitle">The Footprints</div>
+      <div class="item-price" id="itemPrice">$30</div>
+    </div>
+
+    <div class="step-label">Step 1 — Send Payment</div>
+    <div class="mpesa-block">
+      <div class="mpesa-logo">
+        <span class="mpesa-m">M</span><span class="mpesa-dash">-</span><span class="mpesa-pesa">PESA</span>
+      </div>
+      <div class="mpesa-number">0116861680</div>
+      <div class="mpesa-hint">Captain's TradePath</div>
+    </div>
+
+    <form id="checkoutForm">
+      <div class="step-label">Step 2 — Enter Transaction Code</div>
+      <label>M-Pesa Code (e.g. QK47XXXXXX)</label>
+      <input type="text" id="mpesaCode" required maxlength="12" placeholder="QK47XXXXXX">
+      <button type="submit" id="submitBtn">Submit Payment</button>
+    </form>
+
+    <div class="message" id="message"></div>
+    <p class="back"><a href="index.html">← Back to home</a></p>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://jzrvfrtjuesgrlzkenyx.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6cnZmcnRqdWVzZ3Jsemtlbnl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0MjUzMTksImV4cCI6MjEwNjAwMTMxOX0.tShD8DktmCbfMqUCkaQE8PRmz6rlH_kjQoml4TlH2ic';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const params = new URLSearchParams(window.location.search);
+const itemTitle = params.get('title') || 'Item';
+const itemPrice = params.get('price') || '30';
+const itemType = params.get('type') || 'book';
+
+document.getElementById('itemTitle').textContent = itemTitle;
+document.getElementById('itemPrice').textContent = '$' + itemPrice;
+document.getElementById('itemType').textContent = itemType.charAt(0).toUpperCase() + itemType.slice(1);
+
+let currentUser = null;
+
+async function init() {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    window.location.href = 'signup.html';
+    return;
+  }
+
+  currentUser = user;
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('checkoutCard').style.display = 'block';
+}
+
+const form = document.getElementById('checkoutForm');
+const btn = document.getElementById('submitBtn');
+const msg = document.getElementById('message');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+  msg.className = 'message';
+
+  const code = document.getElementById('mpesaCode').value.trim().toUpperCase();
+
+  if (code.length < 8) {
+    msg.className = 'message error';
+    msg.textContent = 'Please enter a valid M-Pesa code';
+    btn.disabled = false;
+    btn.textContent = 'Submit Payment';
+    return;
+  }
+
+  const { error } = await supabase.from('orders').insert({
+    user_id: currentUser.id,
+    item_type: itemType,
+    item_title: itemTitle,
+    amount: parseFloat(itemPrice),
+    currency: 'USD',
+    mpesa_code: code,
+    mpesa_number: '0116861680',
+    status: 'pending'
+  });
+
+  if (error) {
+    msg.className = 'message error';
+    msg.textContent = 'Error: ' + error.message;
+    btn.disabled = false;
+    btn.textContent = 'Submit Payment';
+    return;
+  }
+
+  msg.className = 'message success';
+  msg.textContent = '✅ Payment submitted! We will verify your M-Pesa code and unlock your access within 15 minutes.';
+  btn.textContent = 'Submitted ✓';
+  form.querySelector('input').disabled = true;
+});
+
+init();
+</script>
+</body>
+</html>
