@@ -1629,6 +1629,16 @@ window.addEventListener('scroll', () => {
 
   document.head.appendChild(script);
 })();
+  // === MAKE BUY NOW BUTTONS WORK ===
+document.querySelectorAll('.book-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const card = btn.closest('.book');
+    const title = card.querySelector('.title').textContent.trim();
+    const price = card.querySelector('.price').textContent.replace('$', '').trim();
+    window.location.href = 'checkout.html?type=book&title=' + encodeURIComponent(title) + '&price=' + price;
+  });
+});
 </script>
 </body>
 </html>
