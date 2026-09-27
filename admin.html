@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Captain's TradePath</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+  background: radial-gradient(ellipse at top, #1a1408 0%, #0a0806 100%);
+  color: white;
+  min-height: 100vh;
+  padding: 20px;
+}
+.header {
+  max-width: 1100px;
+  margin: 0 auto 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid #3a2f10;
+}
+.logo {
+  font-size: 1rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #fff8dc, #f0b90b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1px;
+}
+.logout {
+  background: transparent;
+  border: 1px solid #f0b90b;
+  color: #f0b90b;
+  padding: 9px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  font-family: inherit;
+  transition: 0.3s;
+}
+.logout:hover { background: #f0b90b; color: #0a0806; }
+.container { max-width: 1100px; margin: 0 auto; }
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, #fff8dc, #f0b90b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.sub { color: #b8a05a; font-size: 0.9rem; margin-bottom: 30px; }
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+.tab {
+  padding: 10px 20px;
+  background: rgba(20, 16, 8, 0.9);
+  border: 1px solid #3a2f10;
+  color: #b8a05a;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  font-family: inherit;
+  transition: 0.3s;
+}
+.tab:hover { border-color: #f0b90b; color: #f0b90b; }
+.tab.active {
+  background: linear-gradient(135deg, #f0b90b, #d99e08);
+  color: #0a0806;
+  border-color: #f0b90b;
+}
+.order {
+  background: rgba(20, 16, 8, 0.9);
+  border: 1px solid #3a2f10;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 15px;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  gap: 15px;
+  align-items: center;
+  transition: 0.3s;
+}
+.order:hover { border-color: #f0b90b; }
+.order.pending { border-left: 4px solid #f0b90b; }
+.order.approved { border-left: 4px solid #16c784; }
+.order.rejected { border-left: 4px solid #ea3943; }
+.order-item { font-weight: 700; color: #fff; font-size: 1rem; }
+.order-user { color: #b8a05a; font-size: 0.85rem; }
+.order-amount { font-weight: 800; color: #f0b90b; font-size: 1.1rem; }
+.order-code {
+  font-family: 'Courier New', monospace;
+  color: #fff;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-align: center;
+}
+.order-status {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  text-align: center;
+}
+.order-status.pending { background: rgba(240, 185, 11, 0.2); color: #f0b90b; }
+.order-status.approved { background: rgba(22, 199, 132, 0.2); color: #16c784; }
+.order-status.rejected { background: rgba(234, 57, 67, 0.2); color: #ea3943; }
+.order-actions { display: flex; gap: 8px; }
+.btn-approve, .btn-reject {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  font-family: inherit;
+  transition: 0.3s;
+}
+.btn-approve { background: #16c784; color: #0a0806; }
+.btn-approve:hover { background: #1ee093; box-shadow: 0 0 15px rgba(22, 199, 132, 0.5); }
+.btn-reject { background: transparent; border: 1px solid #ea3943; color: #ea3943; }
+.btn-reject:hover { background: #ea3943; color: white; }
+.empty { text-align: center; padding: 60px 20px; color: #8a7850; font-size: 0.95rem; }
+.loading { text-align: center; padding: 60px; color: #b8a05a; }
+@media (max-width: 768px) {
+  .order { grid-template-columns: 1fr; gap: 12px; }
+  .order-actions { justify-content: flex-start; }
+  h1 { font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">ADMIN — CAPTAIN'S TRADEPATH</div>
+  <button class="logout" id="logoutBtn">Log Out</button>
+</div>
+
+<div class="loading" id="loading">Loading orders...</div>
+
+<div class="container" id="content" style="display:none;">
+  <h1>Orders</h1>
+  <p class="sub">Verify M-Pesa codes and approve payments to grant access.</p>
+
+  <div class="tabs">
+    <button class="tab active" data-filter="pending">Pending</button>
+    <button class="tab" data-filter="approved">Approved</button>
+    <button class="tab" data-filter="rejected">Rejected</button>
+    <button class="tab" data-filter="all">All</button>
+  </div>
+
+  <div id="ordersList"></div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://jzrvfrtjuesgrlzkenyx.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6cnZmcnRqdWVzZ3Jsemtlbnl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0MjUzMTksImV4cCI6MjEwNjAwMTMxOX0.tShD8DktmCbfMqUCkaQE8PRmz6rlH_kjQoml4TlH2ic';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentFilter = 'pending';
+let allOrders = [];
+
+async function init() {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile || profile.role !== 'admin') {
+    alert('Access denied. Admin only.');
+    window.location.href = 'dashboard.html';
+    return;
+  }
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+
+  await loadOrders();
+}
+
+async function loadOrders() {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    document.getElementById('ordersList').innerHTML =
+      '<div class="empty">Error: ' + error.message + '</div>';
+    return;
+  }
+
+  allOrders = data || [];
+  renderOrders();
+}
+
+function renderOrders() {
+  const list = document.getElementById('ordersList');
+
+  const filtered = currentFilter === 'all'
+    ? allOrders
+    : allOrders.filter(o => o.status === currentFilter);
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty">No ' + currentFilter + ' orders.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(order => `
+    <div class="order ${order.status}">
+      <div>
+        <div class="order-item">${order.item_title || 'Item'}</div>
+        <div class="order-user">${order.item_type || 'book'}</div>
+      </div>
+      <div class="order-amount">$${order.amount}</div>
+      <div class="order-code">${order.mpesa_code || '—'}</div>
+      <div class="order-status ${order.status}">${order.status}</div>
+      <div class="order-actions">
+        ${order.status === 'pending' ? `
+          <button class="btn-approve" data-id="${order.id}">Approve</button>
+          <button class="btn-reject" data-id="${order.id}">Reject</button>
+        ` : '<span style="color:#8a7850;font-size:0.75rem;">—</span>'}
+      </div>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.btn-approve').forEach(btn => {
+    btn.addEventListener('click', () => updateOrder(btn.dataset.id, 'approved'));
+  });
+  list.querySelectorAll('.btn-reject').forEach(btn => {
+    btn.addEventListener('click', () => updateOrder(btn.dataset.id, 'rejected'));
+  });
+}
+
+async function updateOrder(orderId, newStatus) {
+  const { error } = await supabase
+    .from('orders')
+    .update({
+      status: newStatus,
+      approved_at: newStatus === 'approved' ? new Date().toISOString() : null
+    })
+    .eq('id', orderId);
+
+  if (error) {
+    alert('Failed: ' + error.message);
+    return;
+  }
+
+  await loadOrders();
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentFilter = tab.dataset.filter;
+    renderOrders();
+  });
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await supabase.auth.signOut();
+  window.location.href = 'index.html';
+});
+
+init();
+</script>
+</body>
+</html>
