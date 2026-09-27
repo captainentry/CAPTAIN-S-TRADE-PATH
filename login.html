@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — Captain's TradePath</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+  background: radial-gradient(ellipse at top, #1a1408 0%, #0a0806 100%);
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.card {
+  background: rgba(20, 16, 8, 0.95);
+  border: 1px solid #f0b90b;
+  border-radius: 20px;
+  padding: 40px 35px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(240, 185, 11, 0.2);
+}
+.brand {
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-size: 0.75rem;
+  color: #f0b90b;
+  margin-bottom: 24px;
+  opacity: 0.85;
+}
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, #fff8dc, #f0b90b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+}
+.sub {
+  text-align: center;
+  color: #b8a05a;
+  font-size: 0.9rem;
+  margin-bottom: 30px;
+}
+label {
+  display: block;
+  font-size: 0.8rem;
+  color: #f0b90b;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid #3a2f10;
+  border-radius: 10px;
+  color: white;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  font-family: inherit;
+}
+input:focus {
+  outline: none;
+  border-color: #f0b90b;
+  box-shadow: 0 0 20px rgba(240, 185, 11, 0.2);
+}
+button {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #f0b90b, #d99e08);
+  color: #0a0806;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: 0.3s;
+  margin-top: 10px;
+  font-family: inherit;
+}
+button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ffd86b, #f0b90b);
+  box-shadow: 0 10px 30px rgba(240, 185, 11, 0.5);
+}
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+.message {
+  margin-top: 20px;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.9rem;
+  display: none;
+}
+.message.error {
+  display: block;
+  background: rgba(234, 57, 67, 0.2);
+  border: 1px solid #ea3943;
+  color: #ff8a8f;
+}
+.link { text-align: center; margin-top: 25px; color: #b8a05a; font-size: 0.9rem; }
+.link a { color: #f0b90b; text-decoration: none; font-weight: 700; }
+.link a:hover { text-decoration: underline; }
+.back-home { text-align: center; margin-top: 18px; }
+.back-home a { color: #8a7850; text-decoration: none; font-size: 0.8rem; }
+.back-home a:hover { color: #f0b90b; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand">CAPTAIN'S TRADEPATH</div>
+  <h1>Welcome Back</h1>
+  <p class="sub">Log in to continue your journey</p>
+
+  <form id="loginForm">
+    <label>Email</label>
+    <input type="email" id="email" required placeholder="you@example.com">
+
+    <label>Password</label>
+    <input type="password" id="password" required placeholder="Your password">
+
+    <button type="submit" id="submitBtn">Log In</button>
+  </form>
+
+  <div class="message" id="message"></div>
+  <p class="link">Don't have an account? <a href="signup.html">Sign up</a></p>
+  <p class="back-home"><a href="index.html">← Back to home</a></p>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://jzrvfrtjuesgrlzkenyx.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6cnZmcnRqdWVzZ3Jsemtlbnl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0MjUzMTksImV4cCI6MjEwNjAwMTMxOX0.tShD8DktmCbfMqUCkaQE8PRmz6rlH_kjQoml4TlH2ic';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const form = document.getElementById('loginForm');
+const btn = document.getElementById('submitBtn');
+const msg = document.getElementById('message');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  btn.disabled = true;
+  btn.textContent = 'Logging in...';
+  msg.className = 'message';
+
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    msg.className = 'message error';
+    msg.textContent = error.message;
+    btn.disabled = false;
+    btn.textContent = 'Log In';
+    return;
+  }
+
+  window.location.href = 'dashboard.html';
+});
+</script>
+</body>
+</html>
